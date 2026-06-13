@@ -12,12 +12,13 @@ body {
   background: transparent;
   color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial, sans-serif;
+  overflow: hidden;
 }
 
 .dash {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 40px 48px;
+  padding: 20px 32px;
 }
 
 /* ── Header ── */
@@ -25,17 +26,17 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 40px;
+  margin-bottom: 16px;
 }
 
 .header h1 {
-  font-size: 36px;
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.5px;
 }
 
 .updated {
-  font-size: 20px;
+  font-size: 15px;
   color: #6b7280;
 }
 
@@ -44,9 +45,9 @@ body {
 /* ── Rings ── */
 .rings-row {
   display: flex;
-  gap: 48px;
+  gap: 32px;
   justify-content: center;
-  margin-bottom: 48px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
@@ -54,7 +55,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
 }
 
 .ring-pos { position: relative; }
@@ -67,12 +68,12 @@ body {
 .ring-track {
   fill: none;
   stroke: #1e2a38;
-  stroke-width: 18;
+  stroke-width: 14;
 }
 
 .ring-fill {
   fill: none;
-  stroke-width: 18;
+  stroke-width: 14;
   stroke-linecap: round;
   transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1);
 }
@@ -87,7 +88,7 @@ body {
 }
 
 .ring-val {
-  font-size: 22px;
+  font-size: 17px;
   font-weight: 700;
   color: #fff;
   line-height: 1.2;
@@ -97,67 +98,67 @@ body {
 .ring-label { text-align: center; }
 
 .ring-name {
-  font-size: 17px;
+  font-size: 13px;
   font-weight: 600;
   color: #9ca3af;
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .ring-sub {
-  font-size: 15px;
+  font-size: 12px;
   color: #4b5563;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 /* ── Stat cards ── */
 .section-title {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1.2px;
   color: #6b7280;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .stat-card {
   background: #141c26;
-  border-radius: 18px;
-  padding: 24px 20px;
+  border-radius: 14px;
+  padding: 14px 16px;
 }
 
 .stat-label {
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 600;
   color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .stat-val {
-  font-size: 42px;
+  font-size: 30px;
   font-weight: 700;
   line-height: 1;
 }
 
 .stat-unit {
-  font-size: 20px;
+  font-size: 15px;
   color: #6b7280;
   font-weight: 500;
-  margin-left: 4px;
+  margin-left: 3px;
 }
 
 .stat-null {
-  font-size: 24px;
+  font-size: 18px;
   color: #4b5563;
   font-weight: 500;
 }
@@ -166,27 +167,27 @@ body {
 .charts-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 10px;
 }
 
 .chart-card {
   background: #141c26;
-  border-radius: 18px;
-  padding: 24px;
+  border-radius: 14px;
+  padding: 14px;
 }
 
 .chart-title {
-  font-size: 15px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: #6b7280;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .chart-wrap {
   position: relative;
-  height: 180px;
+  height: 110px;
 }
 </style>
 </head>
@@ -195,7 +196,7 @@ body {
 <div class="dash">
 
   <div class="header">
-    <h1>Nancy's Health</h1>
+    <h1>Nancy's Health Dashboard</h1>
     <span class="updated" id="updatedLabel">loading…</span>
   </div>
 
@@ -309,9 +310,9 @@ const RINGS = [
   },
 ];
 
-const RING_R    = 80;
-const RING_CX   = 92;
-const RING_CY   = 92;
+const RING_R    = 60;
+const RING_CX   = 70;
+const RING_CY   = 70;
 const RING_CIRC = 2 * Math.PI * RING_R;
 
 // ── Build ring DOM ────────────────────────────────────────────────────────────
@@ -324,7 +325,7 @@ function buildRings() {
     wrap.className = 'ring-wrap';
     wrap.innerHTML = `
       <div class="ring-pos">
-        <svg class="ring-svg" width="184" height="184" viewBox="0 0 184 184" id="rsvg_${ring.key}">
+        <svg class="ring-svg" width="140" height="140" viewBox="0 0 140 140" id="rsvg_${ring.key}">
           <circle class="ring-track" cx="${RING_CX}" cy="${RING_CY}" r="${RING_R}"/>
           <circle id="rf_${ring.key}" class="ring-fill"
             cx="${RING_CX}" cy="${RING_CY}" r="${RING_R}"
@@ -354,7 +355,7 @@ function animateRing(key, value, goal) {
 
 Chart.defaults.color       = '#6b7280';
 Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, Arial, sans-serif';
-Chart.defaults.font.size   = 15;
+Chart.defaults.font.size   = 12;
 
 const GRID_COLOR = '#1e2a38';
 const TICK_COLOR = '#9ca3af';
@@ -390,11 +391,11 @@ function barChart(id, labels, data, color, goalLine) {
       scales: {
         x: {
           grid: { color: GRID_COLOR },
-          ticks: { color: TICK_COLOR, maxRotation: 0, font: { size: 14 } }
+          ticks: { color: TICK_COLOR, maxRotation: 0, font: { size: 11 } }
         },
         y: {
           grid: { color: GRID_COLOR },
-          ticks: { color: TICK_COLOR, maxTicksLimit: 4, font: { size: 14 },
+          ticks: { color: TICK_COLOR, maxTicksLimit: 4, font: { size: 11 },
             callback: v => v >= 1000 ? (v/1000).toFixed(0)+'k' : v
           },
           min: 0,
@@ -440,11 +441,11 @@ function lineChart(id, labels, data, color) {
       scales: {
         x: {
           grid: { color: GRID_COLOR },
-          ticks: { color: TICK_COLOR, maxRotation: 0, font: { size: 14 } }
+          ticks: { color: TICK_COLOR, maxRotation: 0, font: { size: 11 } }
         },
         y: {
           grid: { color: GRID_COLOR },
-          ticks: { color: TICK_COLOR, maxTicksLimit: 4, font: { size: 14 } },
+          ticks: { color: TICK_COLOR, maxTicksLimit: 4, font: { size: 11 } },
           min: allZero ? 0 : undefined,
         }
       }
