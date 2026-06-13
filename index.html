@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nancy's Health Dashboard — TV</title>
+<link rel="icon" href="data:,">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: transparent;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial, sans-serif;
+}
+
+.dash {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 48px;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 40px;
+}
+
+.header h1 {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.updated {
+  font-size: 20px;
+  color: #6b7280;
+}
+
+.stale { color: #ef4444; }
+
+/* ── Rings ── */
+.rings-row {
+  display: flex;
+  gap: 48px;
+  justify-content: center;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+}
+
+.ring-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.ring-pos { position: relative; }
+
+.ring-svg {
+  transform: rotate(-90deg);
+  display: block;
+}
+
+.ring-track {
+  fill: none;
+  stroke: #1e2a38;
+  stroke-width: 18;
+}
+
+.ring-fill {
+  fill: none;
+  stroke-width: 18;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1);
+}
+
+.ring-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.ring-val {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.ring-label { text-align: center; }
+
+.ring-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.ring-sub {
+  font-size: 15px;
+  color: #4b5563;
+  margin-top: 4px;
+}
+
+/* ── Stat cards ── */
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #6b7280;
+  margin-bottom: 18px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: #141c26;
+  border-radius: 18px;
+  padding: 24px 20px;
+}
+
+.stat-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+}
+
+.stat-val {
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-unit {
+  font-size: 20px;
+  color: #6b7280;
+  font-weight: 500;
+  margin-left: 4px;
+}
+
+.stat-null {
+  font-size: 24px;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+/* ── Trend charts ── */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.chart-card {
+  background: #141c26;
+  border-radius: 18px;
+  padding: 24px;
+}
+
+.chart-title {
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.chart-wrap {
+  position: relative;
+  height: 180px;
+}
+</style>
+</head>
+<body>
+
+<div class="dash">
+
+  <div class="header">
+    <h1>Nancy's Health</h1>
+    <span class="updated" id="updatedLabel">loading…</span>
+  </div>
+
+  <!-- Activity Rings -->
+  <div class="rings-row" id="ringsRow"></div>
+
+  <!-- Today's stats -->
+  <p class="section-title">Today</p>
+  <div class="cards-grid">
+    <div class="stat-card">
+      <div class="stat-label">Steps</div>
+      <div class="stat-val" id="sSteps">--</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Miles</div>
+      <div class="stat-val" id="sMiles">--<span class="stat-unit">mi</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Move</div>
+      <div class="stat-val" style="color:#ff2d55" id="sMove">--<span class="stat-unit" style="color:#6b7280">cal</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Exercise</div>
+      <div class="stat-val" style="color:#30d158" id="sExercise">--<span class="stat-unit" style="color:#6b7280">min</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Stand</div>
+      <div class="stat-val" style="color:#5ac8fa" id="sStand">--<span class="stat-unit" style="color:#6b7280">hr</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Heart rate</div>
+      <div class="stat-val" id="sHR">--<span class="stat-unit">bpm</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Resting HR</div>
+      <div class="stat-val" id="sRHR">--<span class="stat-unit">bpm</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">HRV</div>
+      <div class="stat-val" id="sHRV">--<span class="stat-unit">ms</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Blood oxygen</div>
+      <div class="stat-val" id="sO2">--<span class="stat-unit">%</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Sleep</div>
+      <div class="stat-val" id="sSleep"><span class="stat-null">not tracked</span></div>
+    </div>
+  </div>
+
+  <!-- 7-day trends -->
+  <p class="section-title" style="margin-top: 8px;">7-day trends</p>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Steps</div>
+      <div class="chart-wrap">
+        <canvas id="cSteps" role="img" aria-label="Steps over the last 7 days"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Exercise minutes</div>
+      <div class="chart-wrap">
+        <canvas id="cExercise" role="img" aria-label="Exercise minutes over the last 7 days"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Resting heart rate</div>
+      <div class="chart-wrap">
+        <canvas id="cRHR" role="img" aria-label="Resting heart rate over the last 7 days"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Sleep</div>
+      <div class="chart-wrap">
+        <canvas id="cSleep" role="img" aria-label="Total sleep hours over the last 7 days"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+
+const API_URL = "https://script.google.com/macros/s/AKfycbyILualskjRxdTfVLiDVNZ-kBT1TwtLgwi8eay-DLH0MrXHC0OlQe_BmzHCtbrd7YQKTQ/exec";
+
+// ── Ring definitions ──────────────────────────────────────────────────────────
+
+const RINGS = [
+  {
+    key: 'activeEnergy',
+    label: 'Move',
+    goal: 500,
+    color: '#ff2d55',
+    fmt: v => Math.round(v) + ' cal'
+  },
+  {
+    key: 'exerciseMinutes',
+    label: 'Exercise',
+    goal: 30,
+    color: '#30d158',
+    fmt: v => Math.round(v) + ' min'
+  },
+  {
+    key: 'standHours',
+    label: 'Stand',
+    goal: 12,
+    color: '#5ac8fa',
+    fmt: v => Math.round(v) + ' hr'
+  },
+];
+
+const RING_R    = 80;
+const RING_CX   = 92;
+const RING_CY   = 92;
+const RING_CIRC = 2 * Math.PI * RING_R;
+
+// ── Build ring DOM ────────────────────────────────────────────────────────────
+
+function buildRings() {
+  const row = document.getElementById('ringsRow');
+  RINGS.forEach(ring => {
+    const goalDisplay = ring.goal >= 1000 ? (ring.goal / 1000) + 'k' : ring.goal;
+    const wrap = document.createElement('div');
+    wrap.className = 'ring-wrap';
+    wrap.innerHTML = `
+      <div class="ring-pos">
+        <svg class="ring-svg" width="184" height="184" viewBox="0 0 184 184" id="rsvg_${ring.key}">
+          <circle class="ring-track" cx="${RING_CX}" cy="${RING_CY}" r="${RING_R}"/>
+          <circle id="rf_${ring.key}" class="ring-fill"
+            cx="${RING_CX}" cy="${RING_CY}" r="${RING_R}"
+            stroke="${ring.color}"
+            stroke-dasharray="${RING_CIRC}"
+            stroke-dashoffset="${RING_CIRC}"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-val" id="rv_${ring.key}">--</div>
+        </div>
+      </div>
+      <div class="ring-label">
+        <div class="ring-name">${ring.label}</div>
+        <div class="ring-sub">goal ${goalDisplay}</div>
+      </div>`;
+    row.appendChild(wrap);
+  });
+}
+
+function animateRing(key, value, goal) {
+  const pct = Math.min(1, Math.max(0, value / goal));
+  const el  = document.getElementById('rf_' + key);
+  if (el) el.style.strokeDashoffset = RING_CIRC - pct * RING_CIRC;
+}
+
+// ── Chart helpers ─────────────────────────────────────────────────────────────
+
+Chart.defaults.color       = '#6b7280';
+Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, Arial, sans-serif';
+Chart.defaults.font.size   = 15;
+
+const GRID_COLOR = '#1e2a38';
+const TICK_COLOR = '#9ca3af';
+
+function barChart(id, labels, data, color, goalLine) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+
+  const last = data.length - 1;
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: data.map((_, i) => i === last ? color + 'cc' : color + '55'),
+        borderColor:     data.map((_, i) => i === last ? color       : color + '88'),
+        borderWidth: 1,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          bodyFont: { size: 15 },
+          callbacks: { label: ctx => ' ' + Math.round(ctx.parsed.y).toLocaleString() }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: GRID_COLOR },
+          ticks: { color: TICK_COLOR, maxRotation: 0, font: { size: 14 } }
+        },
+        y: {
+          grid: { color: GRID_COLOR },
+          ticks: { color: TICK_COLOR, maxTicksLimit: 4, font: { size: 14 },
+            callback: v => v >= 1000 ? (v/1000).toFixed(0)+'k' : v
+          },
+          min: 0,
+          suggestedMax: goalLine ? Math.max(goalLine, ...data) * 1.15 : undefined,
+        }
+      }
+    }
+  });
+}
+
+function lineChart(id, labels, data, color) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+
+  const allZero = data.every(v => !v || v === 0);
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: allZero ? new Array(data.length).fill(null) : data,
+        borderColor:     color,
+        backgroundColor: color + '22',
+        fill: true,
+        tension: 0.35,
+        pointRadius: 5,
+        pointBackgroundColor: color,
+        borderWidth: 3,
+        spanGaps: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          bodyFont: { size: 15 },
+          callbacks: { label: ctx => ctx.parsed.y != null ? ' ' + ctx.parsed.y.toFixed(1) : ' no data' }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: GRID_COLOR },
+          ticks: { color: TICK_COLOR, maxRotation: 0, font: { size: 14 } }
+        },
+        y: {
+          grid: { color: GRID_COLOR },
+          ticks: { color: TICK_COLOR, maxTicksLimit: 4, font: { size: 14 } },
+          min: allZero ? 0 : undefined,
+        }
+      }
+    }
+  });
+}
+
+// ── DOM helpers ───────────────────────────────────────────────────────────────
+
+function setText(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+
+function timeSince(isoStr) {
+  if (!isoStr) return 'unknown';
+  const diff = Math.floor((Date.now() - new Date(isoStr)) / 60000);
+  if (diff < 1)  return 'just now';
+  if (diff < 60) return diff + 'm ago';
+  const h = Math.floor(diff / 60);
+  const m = diff % 60;
+  return h + 'h ' + m + 'm ago';
+}
+
+// ── Main load ─────────────────────────────────────────────────────────────────
+
+async function loadData() {
+  try {
+    const res = await fetch(API_URL);
+    const d   = await res.json();
+
+    if (d.error) {
+      document.getElementById('updatedLabel').textContent = 'Error: ' + d.error;
+      return;
+    }
+
+    // Freshness label
+    const diffMins = d.lastUpdated
+      ? Math.floor((Date.now() - new Date(d.lastUpdated)) / 60000)
+      : 999;
+    const stale = diffMins > 30;
+    document.getElementById('updatedLabel').innerHTML =
+      `<span class="${stale ? 'stale' : ''}">Updated ${timeSince(d.lastUpdated)}</span>`;
+
+    // Rings
+    RINGS.forEach(ring => {
+      const val = d[ring.key] || 0;
+      animateRing(ring.key, val, ring.goal);
+      document.getElementById('rv_' + ring.key).textContent = ring.fmt(val);
+    });
+
+    // Stat cards
+    const stepsVal = d.steps || 0;
+    setText('sSteps', stepsVal >= 1000
+      ? `${(stepsVal / 1000).toFixed(1)}<span class="stat-unit">k</span>`
+      : String(Math.round(stepsVal)));
+    setText('sHR',  `${d.heartRate  || '--'}<span class="stat-unit">bpm</span>`);
+    setText('sMove',     `${Math.round(d.activeEnergy || 0)}<span class="stat-unit" style="color:#6b7280">cal</span>`);
+    setText('sExercise', `${Math.round(d.exerciseMinutes || 0)}<span class="stat-unit" style="color:#6b7280">min</span>`);
+    setText('sStand',    `${Math.round(d.standHours || 0)}<span class="stat-unit" style="color:#6b7280">hr</span>`);
+    setText('sRHR', `${d.restingHeartRate || '--'}<span class="stat-unit">bpm</span>`);
+    setText('sHRV', `${d.hrv        || '--'}<span class="stat-unit">ms</span>`);
+    setText('sO2',  `${d.bloodOxygen || '--'}<span class="stat-unit">%</span>`);
+    setText('sMiles', `${Number(d.distance || 0).toFixed(2)}<span class="stat-unit">mi</span>`);
+
+    const sleep = d.sleep;
+    if (!sleep || sleep === 0) {
+      setText('sSleep', '<span class="stat-null">not tracked</span>');
+    } else {
+      const h = Math.floor(sleep);
+      const m = Math.round((sleep - h) * 60);
+      setText('sSleep', `${h}<span class="stat-unit">h</span> ${m}<span class="stat-unit">m</span>`);
+    }
+
+    // Trend charts
+    const t      = d.trend || {};
+    const labels = t.labels || [];
+
+    barChart( 'cSteps',    labels, t.steps            || [], '#30d158', 10000);
+    barChart( 'cExercise', labels, t.exerciseMinutes   || [], '#ff9f0a', 30);
+    lineChart('cRHR',      labels, t.restingHeartRate  || [], '#ff2d55');
+    lineChart('cSleep',    labels, t.sleep             || [], '#0a84ff');
+
+  } catch (err) {
+    console.error('Health API error:', err);
+    document.getElementById('updatedLabel').innerHTML =
+      '<span class="stale">Connection error — retrying…</span>';
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+buildRings();
+loadData();
+setInterval(loadData, 60000);
+
+</script>
+</body>
+</html>
