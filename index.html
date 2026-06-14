@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Nancy's Health Dashboard — TV</title>
+<title>Nancy's Health Dashboard</title>
 <link rel="icon" href="data:,">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -16,27 +16,26 @@ body {
 }
 
 .dash {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 32px;
+  padding: 28px 28px;
 }
 
-/* ── Header ── */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .header h1 {
   font-size: 26px;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.3px;
 }
 
 .updated {
-  font-size: 15px;
+  font-size: 14px;
   color: #6b7280;
 }
 
@@ -47,7 +46,7 @@ body {
   display: flex;
   gap: 32px;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
   flex-wrap: wrap;
 }
 
@@ -68,12 +67,12 @@ body {
 .ring-track {
   fill: none;
   stroke: #1e2a38;
-  stroke-width: 14;
+  stroke-width: 13;
 }
 
 .ring-fill {
   fill: none;
-  stroke-width: 14;
+  stroke-width: 13;
   stroke-linecap: round;
   transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1);
 }
@@ -88,7 +87,7 @@ body {
 }
 
 .ring-val {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 700;
   color: #fff;
   line-height: 1.2;
@@ -98,41 +97,41 @@ body {
 .ring-label { text-align: center; }
 
 .ring-name {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  color: #9ca3af;
+  color: #6b7280;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   margin-top: 2px;
 }
 
 .ring-sub {
-  font-size: 12px;
+  font-size: 11px;
   color: #4b5563;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 /* ── Stat cards ── */
 .section-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
+  letter-spacing: 0.8px;
   color: #6b7280;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .stat-card {
   background: #141c26;
   border-radius: 14px;
-  padding: 14px 16px;
+  padding: 16px 14px;
 }
 
 .stat-label {
@@ -140,27 +139,26 @@ body {
   font-weight: 600;
   color: #6b7280;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
 }
 
 .stat-val {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 700;
   line-height: 1;
 }
 
 .stat-unit {
-  font-size: 15px;
+  font-size: 14px;
   color: #6b7280;
-  font-weight: 500;
-  margin-left: 3px;
+  font-weight: 400;
+  margin-left: 2px;
 }
 
 .stat-null {
-  font-size: 18px;
+  font-size: 16px;
   color: #4b5563;
-  font-weight: 500;
 }
 
 /* ── Trend charts ── */
@@ -180,14 +178,18 @@ body {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
   color: #6b7280;
   margin-bottom: 10px;
 }
 
 .chart-wrap {
   position: relative;
-  height: 110px;
+  height: 120px;
+}
+
+@media (max-width: 520px) {
+  .charts-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -196,7 +198,7 @@ body {
 <div class="dash">
 
   <div class="header">
-    <h1>Nancy's Health Dashboard</h1>
+    <h1>Nancy's Health</h1>
     <span class="updated" id="updatedLabel">loading…</span>
   </div>
 
@@ -310,9 +312,9 @@ const RINGS = [
   },
 ];
 
-const RING_R    = 60;
-const RING_CX   = 70;
-const RING_CY   = 70;
+const RING_R    = 52;
+const RING_CX   = 62;
+const RING_CY   = 62;
 const RING_CIRC = 2 * Math.PI * RING_R;
 
 // ── Build ring DOM ────────────────────────────────────────────────────────────
@@ -325,7 +327,7 @@ function buildRings() {
     wrap.className = 'ring-wrap';
     wrap.innerHTML = `
       <div class="ring-pos">
-        <svg class="ring-svg" width="140" height="140" viewBox="0 0 140 140" id="rsvg_${ring.key}">
+        <svg class="ring-svg" width="124" height="124" viewBox="0 0 124 124" id="rsvg_${ring.key}">
           <circle class="ring-track" cx="${RING_CX}" cy="${RING_CY}" r="${RING_R}"/>
           <circle id="rf_${ring.key}" class="ring-fill"
             cx="${RING_CX}" cy="${RING_CY}" r="${RING_R}"
@@ -353,12 +355,12 @@ function animateRing(key, value, goal) {
 
 // ── Chart helpers ─────────────────────────────────────────────────────────────
 
-Chart.defaults.color       = '#6b7280';
-Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, Arial, sans-serif';
-Chart.defaults.font.size   = 12;
+Chart.defaults.color          = '#6b7280';
+Chart.defaults.font.family    = '-apple-system, BlinkMacSystemFont, Arial, sans-serif';
+Chart.defaults.font.size      = 12;
 
 const GRID_COLOR = '#1e2a38';
-const TICK_COLOR = '#9ca3af';
+const TICK_COLOR = '#6b7280';
 
 function barChart(id, labels, data, color, goalLine) {
   const ctx = document.getElementById(id);
@@ -375,7 +377,7 @@ function barChart(id, labels, data, color, goalLine) {
         backgroundColor: data.map((_, i) => i === last ? color + 'cc' : color + '55'),
         borderColor:     data.map((_, i) => i === last ? color       : color + '88'),
         borderWidth: 1,
-        borderRadius: 6,
+        borderRadius: 4,
       }]
     },
     options: {
@@ -384,18 +386,17 @@ function barChart(id, labels, data, color, goalLine) {
       plugins: {
         legend: { display: false },
         tooltip: {
-          bodyFont: { size: 15 },
           callbacks: { label: ctx => ' ' + Math.round(ctx.parsed.y).toLocaleString() }
         }
       },
       scales: {
         x: {
           grid: { color: GRID_COLOR },
-          ticks: { color: TICK_COLOR, maxRotation: 0, font: { size: 11 } }
+          ticks: { color: TICK_COLOR, maxRotation: 0 }
         },
         y: {
           grid: { color: GRID_COLOR },
-          ticks: { color: TICK_COLOR, maxTicksLimit: 4, font: { size: 11 },
+          ticks: { color: TICK_COLOR, maxTicksLimit: 4,
             callback: v => v >= 1000 ? (v/1000).toFixed(0)+'k' : v
           },
           min: 0,
@@ -407,7 +408,7 @@ function barChart(id, labels, data, color, goalLine) {
 }
 
 function lineChart(id, labels, data, color) {
-  const ctx = document.getElementById(id);
+  const ctx     = document.getElementById(id);
   if (!ctx) return;
 
   const allZero = data.every(v => !v || v === 0);
@@ -422,9 +423,9 @@ function lineChart(id, labels, data, color) {
         backgroundColor: color + '22',
         fill: true,
         tension: 0.35,
-        pointRadius: 5,
+        pointRadius: 3,
         pointBackgroundColor: color,
-        borderWidth: 3,
+        borderWidth: 2,
         spanGaps: false,
       }]
     },
@@ -434,18 +435,17 @@ function lineChart(id, labels, data, color) {
       plugins: {
         legend: { display: false },
         tooltip: {
-          bodyFont: { size: 15 },
           callbacks: { label: ctx => ctx.parsed.y != null ? ' ' + ctx.parsed.y.toFixed(1) : ' no data' }
         }
       },
       scales: {
         x: {
           grid: { color: GRID_COLOR },
-          ticks: { color: TICK_COLOR, maxRotation: 0, font: { size: 11 } }
+          ticks: { color: TICK_COLOR, maxRotation: 0 }
         },
         y: {
           grid: { color: GRID_COLOR },
-          ticks: { color: TICK_COLOR, maxTicksLimit: 4, font: { size: 11 } },
+          ticks: { color: TICK_COLOR, maxTicksLimit: 4 },
           min: allZero ? 0 : undefined,
         }
       }
@@ -541,6 +541,15 @@ async function loadData() {
 buildRings();
 loadData();
 setInterval(loadData, 60000);
+
+
+// ── Compact mode ─────────────────────────────────────────────────────────────
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('compact') === '1') {
+    document.body.classList.add('compact');
+  }
+})();
 
 </script>
 </body>
