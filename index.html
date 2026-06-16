@@ -362,13 +362,25 @@ Chart.defaults.font.size      = 12;
 const GRID_COLOR = '#1e2a38';
 const TICK_COLOR = '#6b7280';
 
+// Registry of active Chart instances keyed by canvas id
+const _charts = {};
+
+function destroyChart(id) {
+  if (_charts[id]) {
+    _charts[id].destroy();
+    delete _charts[id];
+  }
+}
+
 function barChart(id, labels, data, color, goalLine) {
   const ctx = document.getElementById(id);
   if (!ctx) return;
 
+  destroyChart(id);
+
   const last = data.length - 1;
 
-  new Chart(ctx, {
+  _charts[id] = new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
@@ -411,9 +423,11 @@ function lineChart(id, labels, data, color) {
   const ctx     = document.getElementById(id);
   if (!ctx) return;
 
+  destroyChart(id);
+
   const allZero = data.every(v => !v || v === 0);
 
-  new Chart(ctx, {
+  _charts[id] = new Chart(ctx, {
     type: 'line',
     data: {
       labels,
@@ -435,7 +449,7 @@ function lineChart(id, labels, data, color) {
       plugins: {
         legend: { display: false },
         tooltip: {
-          callbacks: { label: ctx => ctx.parsed.y != null ? ' ' + ctx.parsed.y.toFixed(1) : ' no data' }
+          callbacks: { label: c => c.parsed.y != null ? ' ' + c.parsed.y.toFixed(1) : ' no data' }
         }
       },
       scales: {
